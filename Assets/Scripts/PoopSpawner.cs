@@ -3,15 +3,15 @@ using UnityEngine;
 public class PoopSpawner : MonoBehaviour
 {
     [Header("스폰 설정")]
-    public GameObject poopPrefab;       // 인스펙터에서 프리팹 연결
-    public float spawnInterval = 1f;    // 스폰 간격 (초)
-    public float minX = -8f;            // 스폰 X 최솟값
-    public float maxX = 8f;             // 스폰 X 최댓값
-    public float spawnY = 7f;           // 스폰 Y 위치 (화면 위)
+    public GameObject poopPrefab;      
+    public float spawnInterval = 1f;   
+    public float minX = -8f;           
+    public float maxX = 8f;             
+    public float spawnY = 7f;         
 
     [Header("난이도 증가")]
-    public float intervalDecreaseRate = 0.05f; // 매 스폰마다 간격 감소량
-    public float minInterval = 0.2f;           // 최소 스폰 간격
+    public float intervalDecreaseRate = 0.05f;
+    public float minInterval = 0.2f;           
 
     private float timer = 0f;
 
@@ -25,8 +25,7 @@ public class PoopSpawner : MonoBehaviour
         {
             SpawnPoop();
             timer = 0f;
-
-            // 난이도 증가: 점점 빠르게 스폰
+            
             spawnInterval = Mathf.Max(minInterval, spawnInterval - intervalDecreaseRate);
         }
     }
