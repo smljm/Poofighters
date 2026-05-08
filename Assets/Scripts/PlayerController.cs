@@ -5,34 +5,42 @@ using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
-    [Header("이동 설정")]
     public float moveSpeed = 5f;
     public float clampX = 8.5f;
 
-    [Header("대쉬 설정 (Space)")]
-    public float dashDistance = 3f;
+    public float dashDuration = 0.5f;
+    public float dashCooldown = 3f;
+    private float dashTimer = 0f;
+    private bool isDashing = false;
 
-    [Header("스피드 부스트 설정 (E키)")]
     public float speedBoostMultiplier = 2.5f;
     public float speedBoostDuration = 1f;
     public float speedBoostCooldown = 5f;
 
-    [Header("주변 제거 설정 (Q키)")]
     public float clearRadius = 3f;
     public float clearCooldown = 7f;
 
-    [Header("스킬 UI")]
     public TextMeshProUGUI skillText;
 
     private float currentSpeedMultiplier = 1f;
     private float speedBoostTimer = 0f;
     private float clearTimer = 0f;
     private bool isSpeedBoosting = false;
+    private int pressCount = 0;
+
+    private SpriteRenderer sr;
+    private Color originalColor;
 
     public float SpeedBoostCooldownRatio =>
         speedBoostTimer > 0f ? speedBoostTimer / speedBoostCooldown : 0f;
     public float ClearCooldownRatio =>
         clearTimer > 0f ? clearTimer / clearCooldown : 0f;
+
+    void Start()
+    {
+        sr = GetComponent<SpriteRenderer>();
+        originalColor = sr.color;
+    }
 
     void Update()
     {
@@ -48,6 +56,7 @@ public class PlayerController : MonoBehaviour
     {
         if (speedBoostTimer > 0f) speedBoostTimer -= Time.deltaTime;
         if (clearTimer > 0f) clearTimer -= Time.deltaTime;
+        if (dashTimer > 0f) dashTimer -= Time.deltaTime;
     }
 
     void HandleMovement()
@@ -66,14 +75,34 @@ public class PlayerController : MonoBehaviour
     void HandleDash()
     {
         if (!Keyboard.current.spaceKey.wasPressedThisFrame) return;
+        if (dashTimer > 0f) return;
+        if (isDashing) return;
 
-        float input = 0f;
-        if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed) input = -1f;
-        if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed) input = 1f;
-        if (Mathf.Abs(input) < 0.1f) return;
+        StartCoroutine(DashCoroutine());
+    }
 
-        float targetX = Mathf.Clamp(transform.position.x + input * dashDistance, -clampX, clampX);
-        transform.position = new Vector3(targetX, transform.position.y, 0f);
+    IEnumerator DashCoroutine()
+    {
+        isDashing = true;
+        sr.color = new Color(1f, 1f, 0f, 0.7f);
+
+        Physics2D.IgnoreLayerCollision(
+            LayerMask.NameToLayer("Player"),
+            LayerMask.NameToLayer("Poop"),
+            true
+        );
+
+        yield return new WaitForSeconds(dashDuration);
+
+        Physics2D.IgnoreLayerCollision(
+            LayerMask.NameToLayer("Player"),
+            LayerMask.NameToLayer("Poop"),
+            false
+        );
+
+        sr.color = originalColor;
+        isDashing = false;
+        dashTimer = dashCooldown;
     }
 
     void HandleSpeedBoost()
@@ -144,13 +173,17 @@ public class PlayerController : MonoBehaviour
     {
         if (skillText == null) return;
 
-        string spaceStr = "Space(Dash): Ready";
+        string spaceStr = isDashing
+            ? "Space(Invincible): Active!"
+            : dashTimer > 0f
+            ? $"Space(Invincible): {dashTimer:F1}s"
+            : "Space(Invincible): Ready";
 
         string eStr = isSpeedBoosting
             ? "E(Boost): Active!"
             : speedBoostTimer > 0f
-                ? $"E(Boost): {speedBoostTimer:F1}s"
-                : "E(Boost): Ready";
+            ? $"E(Boost): {speedBoostTimer:F1}s"
+            : "E(Boost): Ready";
 
         string qStr = clearTimer > 0f
             ? $"Q(Clear): {clearTimer:F1}s"
@@ -165,8 +198,6 @@ public class PlayerController : MonoBehaviour
         {
             if (GameManager.Instance != null)
                 GameManager.Instance.GameOver();
-            else
-                Debug.LogError("GameManager가 씬에 없습니다!");
         }
     }
 

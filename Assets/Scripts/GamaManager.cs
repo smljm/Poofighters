@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 using TMPro;
 
 public class GameManager : MonoBehaviour
@@ -21,7 +22,13 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        if (Keyboard.current.rKey.wasPressedThisFrame)
+        {
+            RestartGame();
+        }
+
         if (!IsPlaying) return;
+
         survivalTime += Time.deltaTime;
         if (timeText != null)
             timeText.text = $"Time: {survivalTime:F1}s";
