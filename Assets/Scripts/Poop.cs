@@ -2,19 +2,24 @@ using UnityEngine;
 
 public class Poop : MonoBehaviour
 {
-    float fallSpeed;
-    float destroyY = -7f;
+    private float _fallSpeed;
+    private const float DestroyY = -7f;
 
-    void Start()
+    void OnEnable()
     {
-        fallSpeed = Random.Range(2f, 12f);
+        _fallSpeed = Random.Range(2f, 12f);
     }
 
     void Update()
     {
-        transform.position += Vector3.down * fallSpeed * Time.deltaTime;
+        transform.position += Vector3.down * (_fallSpeed * Time.deltaTime);
 
-        if (transform.position.y < destroyY)
-            Destroy(gameObject);
+        if (transform.position.y < DestroyY)
+            ReturnToPool();
+    }
+
+    public void ReturnToPool()
+    {
+        PoopPool.Instance.Return(gameObject);
     }
 }

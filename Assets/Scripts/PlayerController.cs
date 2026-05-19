@@ -26,7 +26,6 @@ public class PlayerController : MonoBehaviour
     private float speedBoostTimer = 0f;
     private float clearTimer = 0f;
     private bool isSpeedBoosting = false;
-    private int pressCount = 0;
 
     private SpriteRenderer sr;
     private Color originalColor;
@@ -137,7 +136,7 @@ public class PlayerController : MonoBehaviour
         foreach (var hit in hits)
         {
             if (hit.CompareTag("Poop"))
-                Destroy(hit.gameObject);
+                hit.GetComponent<Poop>()?.ReturnToPool();
         }
 
         clearTimer = clearCooldown;
@@ -173,35 +172,33 @@ public class PlayerController : MonoBehaviour
     {
         if (skillText == null) return;
 
-        string spaceStr = isDashing
+        var spaceStr = isDashing
             ? "Space(Invincible): Active!"
             : dashTimer > 0f
             ? $"Space(Invincible): {dashTimer:F1}s"
             : "Space(Invincible): Ready";
 
-        string eStr = isSpeedBoosting
+        var eStr = isSpeedBoosting
             ? "E(Boost): Active!"
             : speedBoostTimer > 0f
             ? $"E(Boost): {speedBoostTimer:F1}s"
             : "E(Boost): Ready";
 
-        string qStr = clearTimer > 0f
+        var qStr = clearTimer > 0f
             ? $"Q(Clear): {clearTimer:F1}s"
             : "Q(Clear): Ready";
 
         skillText.text = $"{spaceStr}\n{eStr}\n{qStr}";
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Poop"))
-        {
-            if (GameManager.Instance != null)
-                GameManager.Instance.GameOver();
-        }
+        if (!other.CompareTag("Poop")) return;
+        other.GetComponent<Poop>()?.ReturnToPool();
+        GameManager.Instance?.GameOver();
     }
 
-    void OnDrawGizmosSelected()
+    private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, clearRadius);

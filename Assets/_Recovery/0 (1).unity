@@ -504,7 +504,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ded6bfe78321a1f4088acb45a6b413c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PoopSpawner
-  poopPrefab: {fileID: 7399892946041726068, guid: 518a9a4b2d3cc304899d8558bb0d86b4, type: 3}
+  poopPrefab: {fileID: 6889404389114820759, guid: 2a433d0a3e8770543990af60418530db, type: 3}
   spawnInterval: 1
   minX: -8
   maxX: 8
@@ -560,13 +560,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   moveSpeed: 5
   clampX: 8.5
-  dashDuration: 0.5
-  dashCooldown: 3
+  dashDuration: 1
+  dashCooldown: 4
   speedBoostMultiplier: 2.5
   speedBoostDuration: 1
   speedBoostCooldown: 2
   clearRadius: 3
-  clearCooldown: 2
+  clearCooldown: 4
   skillText: {fileID: 1376942107}
 --- !u!58 &1005096610
 CircleCollider2D:

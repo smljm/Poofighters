@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     public bool IsPlaying { get; private set; } = true;
-    float survivalTime = 0f;
+    private float _survivalTime = 0f;
 
     [Header("UI")]
     public TextMeshProUGUI timeText;
@@ -29,9 +29,9 @@ public class GameManager : MonoBehaviour
 
         if (!IsPlaying) return;
 
-        survivalTime += Time.deltaTime;
+        _survivalTime += Time.deltaTime;
         if (timeText != null)
-            timeText.text = $"Time: {survivalTime:F1}s";
+            timeText.text = $"Time: {_survivalTime:F1}s";
     }
 
     public void GameOver()
